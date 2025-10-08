@@ -1,7 +1,12 @@
 {
+  "name": "celular-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd backend && npm install && cd ../frontend && npm install && npm run build",
+    "start": "cd backend && node index.js"
+  },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "jsonwebtoken": "^9.0.2",
     "react-router-dom": "^7.9.4"
   }
 }
