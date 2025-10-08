@@ -1,36 +1,64 @@
 .admin-panel {
-  background-color: #ecf0f1;
-  padding: 20px;
+  background-color: #fff;
+  padding: 30px;
   border-radius: 8px;
-  margin-bottom: 30px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .admin-panel h2 {
   margin-top: 0;
+  text-align: center;
+  font-weight: 300;
+  font-size: 2em;
+  margin-bottom: 25px;
 }
 
 .admin-panel form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
 }
 
 .admin-panel input, .admin-panel textarea {
-  padding: 10px;
-  border: 1px solid #bdc3c7;
+  padding: 12px;
+  border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 1em;
+}
+
+.admin-panel textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
 .admin-panel button {
   background-color: #27ae60;
   color: white;
-  padding: 12px;
+  padding: 15px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 1.1em;
+  transition: background-color 0.3s;
 }
 
 .admin-panel button:hover {
   background-color: #229954;
 }
+
+@media (min-width: 600px) {
+  .admin-panel form {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .admin-panel input[placeholder="Nome do produto"],
+  .admin-panel textarea,
+  .admin-panel input[placeholder="URL da imagem"],
+  .admin-panel button {
+    grid-column: 1 / -1;
+  }
+}
+

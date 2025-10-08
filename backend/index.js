@@ -66,6 +66,29 @@ app.post('/comprar', (req, res) => {
   res.json({ ok: true, mensagem: 'Compra registrada! Entraremos em contato.' });
 });
 
+// Rota de contato
+app.post('/contato', (req, res) => {
+  const { nome, email, mensagem } = req.body;
+  // Em um app real, você enviaria um e-mail ou salvaria no DB
+  console.log(`Nova mensagem de contato de ${nome} (${email}): ${mensagem}`);
+  res.json({ ok: true });
+});
+
+// Rota de checkout (simulação)
+app.post('/checkout', (req, res) => {
+  const { cardName, items, total } = req.body;
+  // Em um app real, você processaria o pagamento com um gateway
+  console.log(`Nova compra de ${cardName} no valor de R$ ${total}`);
+  console.log('Itens:', items.map(i => `${i.quantity}x ${i.nome}`).join(', '));
+  
+  // Simula sucesso ou falha aleatoriamente
+  if (Math.random() > 0.1) { // 90% de chance de sucesso
+    res.json({ ok: true, message: 'Pagamento aprovado!' });
+  } else {
+    res.status(400).json({ ok: false, error: 'Falha na comunicação com o banco.' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend rodando em http://localhost:${PORT}`);
 });
