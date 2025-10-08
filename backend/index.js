@@ -37,6 +37,10 @@ db.serialize(() => {
 });
 
 function isModerator(req) {
+  // Em ambiente de desenvolvimento, todos são moderadores para facilitar o teste.
+  if (process.env.NODE_ENV !== 'production') {
+    return true;
+  }
   const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
   return MODERATOR_IPS.includes(ip.replace('::ffff:', ''));
 }
