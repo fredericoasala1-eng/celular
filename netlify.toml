@@ -1,0 +1,11 @@
+# Arquivo de configuração para o Netlify
+
+[build]
+  # Diretório base onde o projeto do frontend está.
+  base = "frontend"
+
+  # Comando para construir o site.
+  command = "npm run build"
+
+  # Pasta que será publicada após o build.
+  publish = "frontend/build"
