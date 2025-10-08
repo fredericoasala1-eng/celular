@@ -5,7 +5,7 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/produtos')
+    fetch('https://celular-1.onrender.com/produtos')
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.error("Erro ao buscar produtos:", err));

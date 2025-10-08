@@ -11,7 +11,7 @@ const AdminPanel = () => {
     e.preventDefault();
     const newProduct = { nome, descricao, preco: parseFloat(preco), imagem };
 
-    fetch('http://localhost:3001/produtos', {
+    fetch('https://celular-1.onrender.com/produtos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProduct)
