@@ -42,6 +42,27 @@ db.serialize(() => {
     preco REAL,
     imagem TEXT
   )`);
+
+  // Adicionar dados de exemplo se a tabela estiver vazia
+  db.get("SELECT COUNT(*) as count FROM produtos", (err, row) => {
+    if (err) {
+      console.error("Erro ao verificar produtos:", err.message);
+      return;
+    }
+    if (row.count === 0) {
+      console.log("Nenhum produto encontrado. Populando o banco de dados com exemplos.");
+      const stmt = db.prepare("INSERT INTO produtos (nome, descricao, preco, imagem) VALUES (?, ?, ?, ?)");
+      const produtosExemplo = [
+        { nome: 'iPhone 13', descricao: 'O mais novo celular da Apple.', preco: 7999.99, imagem: 'https://via.placeholder.com/280x200.png?text=iPhone+13' },
+        { nome: 'Samsung Galaxy S22', descricao: 'O topo de linha da Samsung.', preco: 6499.99, imagem: 'https://via.placeholder.com/280x200.png?text=Galaxy+S22' },
+        { nome: 'Xiaomi Mi 12', descricao: 'Ótimo custo-benefício.', preco: 3999.99, imagem: 'https://via.placeholder.com/280x200.png?text=Xiaomi+Mi+12' }
+      ];
+      produtosExemplo.forEach(p => {
+        stmt.run(p.nome, p.descricao, p.preco, p.imagem);
+      });
+      stmt.finalize();
+    }
+  });
 });
 
 // Middleware para autenticar o token JWT
