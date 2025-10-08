@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Chave secreta para o JWT. Em um app real, use uma variável de ambiente.
 const JWT_SECRET = 'sua-chave-secreta-super-segura';
@@ -128,21 +128,6 @@ app.post('/contato', (req, res) => {
   res.json({ ok: true });
 });
 
-// Rota de checkout (simulação)
-app.post('/checkout', (req, res) => {
-  const { cardName, items, total } = req.body;
-  // Em um app real, você processaria o pagamento com um gateway
-  console.log(`Nova compra de ${cardName} no valor de R$ ${total}`);
-  console.log('Itens:', items.map(i => `${i.quantity}x ${i.nome}`).join(', '));
-  
-  // Simula sucesso ou falha aleatoriamente
-  if (Math.random() > 0.1) { // 90% de chance de sucesso
-    res.json({ ok: true, message: 'Pagamento aprovado!' });
-  } else {
-    res.status(400).json({ ok: false, error: 'Falha na comunicação com o banco.' });
-  }
-});
-
-app.listen(PORT, () => {
-  console.log(`Backend rodando em http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
