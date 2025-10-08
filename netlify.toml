@@ -8,4 +8,4 @@
   command = "npm run build"
 
   # Pasta que será publicada após o build.
-  publish = "frontend/build"
+  publish = "build"
