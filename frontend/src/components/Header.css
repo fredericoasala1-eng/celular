@@ -22,7 +22,7 @@
   align-items: center;
 }
 
-.app-header nav a {
+.app-header nav a, .login-link {
   color: white;
   margin: 0 15px;
   text-decoration: none;
@@ -31,7 +31,7 @@
   padding: 5px 0;
 }
 
-.app-header nav a::after {
+.app-header nav a::after, .login-link::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -42,9 +42,41 @@
   transition: width 0.3s;
 }
 
-.app-header nav a:hover::after {
+.app-header nav a:hover::after, .login-link:hover::after {
   width: 100%;
 }
+
+.logout-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  margin-left: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #c0392b;
+}
+
+.login-link {
+  background-color: #27ae60;
+  padding: 8px 15px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.login-link:hover {
+  background-color: #229954;
+  text-decoration: none;
+}
+.login-link:hover::after {
+  width: 0;
+}
+
 
 .cart-count {
   background-color: #e74c3c;

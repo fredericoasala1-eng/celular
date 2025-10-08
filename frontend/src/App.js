@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
 // Componentes
@@ -8,18 +9,52 @@ import ProductList from './components/ProductList';
 import AdminPanel from './components/AdminPanel';
 import Cart from './components/Cart';
 import Payment from './components/Payment';
+import Login from './components/Login';
+
+// Componente para a página principal que agrupa produtos, carrinho e pagamento
+const MainPage = ({ cartItems, view, handleAddToCart, handleRemoveFromCart, setView, handleFinishPayment }) => {
+  const renderView = () => {
+    switch (view) {
+      case 'cart':
+        return <Cart cartItems={cartItems} onRemoveFromCart={handleRemoveFromCart} onCheckout={() => setView('payment')} />;
+      case 'payment':
+        return <Payment cartItems={cartItems} onBackToCart={() => setView('cart')} onFinishPayment={handleFinishPayment} />;
+      case 'products':
+      default:
+        return <ProductList onAddToCart={handleAddToCart} />;
+    }
+  };
+
+  return (
+    <>
+      {renderView()}
+    </>
+  );
+};
+
+// Componente para rotas protegidas
+const ProtectedRoute = ({ token, children }) => {
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 
 function App() {
-  const [isModerator, setIsModerator] = useState(false);
+  const [token, setToken] = useState(localStorage.getItem('authToken'));
   const [cartItems, setCartItems] = useState([]);
-  const [view, setView] = useState('products'); // 'products', 'cart', 'payment'
+  const [view, setView] = useState('products');
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('moderador') === 'true') {
-      setIsModerator(true);
-    }
-  }, []);
+  const handleLogin = (newToken) => {
+    localStorage.setItem('authToken', newToken);
+    setToken(newToken);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    setToken(null);
+  };
 
   const handleAddToCart = (product) => {
     setCartItems(prevItems => {
@@ -45,31 +80,45 @@ function App() {
     setView('products');
   };
 
-  const renderView = () => {
-    switch (view) {
-      case 'cart':
-        return <Cart cartItems={cartItems} onRemoveFromCart={handleRemoveFromCart} onCheckout={() => setView('payment')} />;
-      case 'payment':
-        return <Payment cartItems={cartItems} onBackToCart={() => setView('cart')} onFinishPayment={handleFinishPayment} />;
-      case 'products':
-      default:
-        return <ProductList onAddToCart={handleAddToCart} />;
-    }
-  };
-
   return (
-    <div className="App">
-      <Header 
-        cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)} 
-        onCartClick={() => setView('cart')}
-        onLogoClick={() => setView('products')}
-      />
-      <main>
-        {isModerator && <AdminPanel />}
-        {renderView()}
-      </main>
-      <Footer />
-    </div>
+    <Router>
+      <div className="App">
+        <Header 
+          cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)} 
+          onCartClick={() => setView('cart')}
+          onLogoClick={() => setView('products')}
+          isLoggedIn={!!token}
+          onLogout={handleLogout}
+        />
+        <main>
+          <Routes>
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute token={token}>
+                  <AdminPanel token={token} />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/" 
+              element={
+                <MainPage 
+                  cartItems={cartItems}
+                  view={view}
+                  handleAddToCart={handleAddToCart}
+                  handleRemoveFromCart={handleRemoveFromCart}
+                  setView={setView}
+                  handleFinishPayment={handleFinishPayment}
+                />
+              } 
+            />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

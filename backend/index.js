@@ -1,22 +1,30 @@
 // Backend inicial Node.js + Express
-// Rodar: npm install express sqlite3 cors
+// Rodar: npm install express sqlite3 cors jsonwebtoken bcryptjs
 
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const app = express();
 const PORT = 3001;
+
+// Chave secreta para o JWT. Em um app real, use uma variável de ambiente.
+const JWT_SECRET = 'sua-chave-secreta-super-segura';
+
+// Credenciais do moderador
+const MODERATOR_USERNAME = 'admin';
+// Hash para a senha "admin123". Gere um novo para produção.
+const MODERATOR_PASSWORD_HASH = '$2a$10$Y.TR5.gY9/C5Zz.p9.i1x.sohvykfzX6f/E4.O.e.g/a.zJ/Z.z9S';
+
 
 app.use(cors());
 app.use(express.json());
 
-// Lista de IPs moderadores (adicione o seu IP aqui)
-const MODERATOR_IPS = ['127.0.0.1'];
-
 const path = require('path');
 
-// Banco de dados SQLite em um disco persistente
-// No Render, vamos montar um disco em '/var/data'
+// Banco de dados SQLite
 const dbPath = process.env.NODE_ENV === 'production' ? '/var/data/db.sqlite' : './db.sqlite';
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
@@ -36,14 +44,36 @@ db.serialize(() => {
   )`);
 });
 
-function isModerator(req) {
-  // Em ambiente de desenvolvimento, todos são moderadores para facilitar o teste.
-  if (process.env.NODE_ENV !== 'production') {
-    return true;
-  }
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  return MODERATOR_IPS.includes(ip.replace('::ffff:', ''));
+// Middleware para autenticar o token JWT
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+  if (token == null) return res.sendStatus(401); // Se não há token, não autorizado
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403); // Se o token não é válido, acesso proibido
+    req.user = user;
+    next();
+  });
 }
+
+// --- ROTAS ---
+
+// Rota de Login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (username === MODERATOR_USERNAME && bcrypt.compareSync(password, MODERATOR_PASSWORD_HASH)) {
+    // Usuário e senha corretos, gerar token
+    const user = { name: username };
+    const accessToken = jwt.sign(user, JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token: accessToken });
+  } else {
+    res.status(401).json({ error: 'Credenciais inválidas' });
+  }
+});
+
 
 // Rotas públicas
 app.get('/produtos', (req, res) => {
@@ -53,9 +83,8 @@ app.get('/produtos', (req, res) => {
   });
 });
 
-// Cadastro de produto (só moderador)
-app.post('/produtos', (req, res) => {
-  if (!isModerator(req)) return res.status(403).json({ error: 'Acesso negado' });
+// Cadastro de produto (agora protegido por token)
+app.post('/produtos', authenticateToken, (req, res) => {
   const { nome, descricao, preco, imagem } = req.body;
   db.run('INSERT INTO produtos (nome, descricao, preco, imagem) VALUES (?, ?, ?, ?)', [nome, descricao, preco, imagem], function(err) {
     if (err) return res.status(500).json({ error: err.message });

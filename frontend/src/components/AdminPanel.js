@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './AdminPanel.css';
 
-const AdminPanel = () => {
+const AdminPanel = ({ token }) => {
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
@@ -13,10 +13,18 @@ const AdminPanel = () => {
 
     fetch('https://celular-1.onrender.com/produtos', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(newProduct)
     })
-    .then(res => res.json())
+    .then(res => {
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('Acesso negado. Faça login novamente.');
+      }
+      return res.json();
+    })
     .then(data => {
       if (data.id) {
         alert('Produto cadastrado com sucesso!');
@@ -24,10 +32,10 @@ const AdminPanel = () => {
         setNome(''); setDescricao(''); setPreco(''); setImagem('');
         window.location.reload(); // Recarrega para ver o novo produto
       } else {
-        alert('Erro ao cadastrar: ' + (data.error || 'Verifique o console'));
+        alert('Erro ao cadastrar: ' + (data.error || 'Verifique os dados'));
       }
     })
-    .catch(err => alert('Acesso negado ou erro de conexão. Você é um moderador?'));
+    .catch(err => alert(err.message || 'Erro de conexão.'));
   };
 
   return (
