@@ -6,6 +6,7 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -21,8 +22,6 @@ const MODERATOR_PASSWORD_HASH = '$2a$10$Y.TR5.gY9/C5Zz.p9.i1x.sohvykfzX6f/E4.O.e
 
 app.use(cors());
 app.use(express.json());
-
-const path = require('path');
 
 // Banco de dados SQLite
 const dbPath = process.env.NODE_ENV === 'production' ? '/var/data/db.sqlite' : './db.sqlite';
@@ -126,6 +125,14 @@ app.post('/contato', (req, res) => {
   // Em um app real, você enviaria um e-mail ou salvaria no DB
   console.log(`Nova mensagem de contato de ${nome} (${email}): ${mensagem}`);
   res.json({ ok: true });
+});
+
+// Servir arquivos estáticos do React
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// Rota para servir o app React
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
