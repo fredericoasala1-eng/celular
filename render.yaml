@@ -2,6 +2,6 @@ services:
   - type: web
     name: celular-app
     env: node
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend
+    startCommand: cd backend && npm install && node index.js
     plan: free
