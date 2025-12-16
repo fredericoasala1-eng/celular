@@ -1,0 +1,7 @@
+{
+  "name": "ten-cmd",
+  "version": "1.0.0",
+  "bin": {
+    "10": "bin/10.js"
+  }
+}
