@@ -4,10 +4,14 @@
   "private": true,
   "scripts": {
     "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "cd backend && npm install && node index.js"
+    "start": "node server.js",
+    "dev": "cd backend && node index.js"
   },
   "dependencies": {
     "react-router-dom": "^7.9.4"
+  },
+  "engines": {
+    "node": "22.16.0"
   }
 }
 
